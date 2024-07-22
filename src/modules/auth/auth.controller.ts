@@ -10,8 +10,9 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
 	@Post('user-existence')
-  @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
+	@ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
 	async userExistence(@Body() authDto: AuthDto) {
 		return this.authService.userExistence(authDto);
 	}
+
 }

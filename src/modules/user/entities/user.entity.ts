@@ -1,23 +1,39 @@
-import { EntityBase } from "src/common/abstracts/base.entity";
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { EntityBase } from 'src/common/abstracts/base.entity';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	OneToMany,
+	OneToOne,
+	UpdateDateColumn,
+} from 'typeorm';
+import { OTP } from './otp.entity';
 
-@Entity({ name: "users" })
+@Entity({ name: 'users' })
 export class User extends EntityBase {
-    @Column({ unique: true })
-    username: string;
+	@Column({ unique: true })
+	username: string;
 
-    @Column({ unique: true })
-    phoneNumber: string;
-    
-    @Column({ unique: true })
-    email: string;
+	@Column({ unique: true, nullable: true })
+	phoneNumber: string;
 
-    @Column({ nullable: true })
-    password: string;
+	@Column({ unique: true, nullable: true })
+	email: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+	@Column({ nullable: true })
+	password: string;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+	@Column({ nullable: true })
+	otpId: number;
+
+	@OneToOne(() => OTP, otp => otp.user, { cascade: ['remove'], nullable: true })
+	@JoinColumn({ name: 'otpId' })
+	otp: OTP;
+
+	@CreateDateColumn()
+	createdAt: Date;
+
+	@UpdateDateColumn()
+	updatedAt: Date;
 }
