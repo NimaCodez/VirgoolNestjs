@@ -11,8 +11,8 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const path_1 = require("path");
 const typeorm_1 = require("@nestjs/typeorm");
-const typeorm_config_1 = require("./config/typeorm.config");
-const user_module_1 = require("./modules/user/user.module");
+const typeorm_config_1 = require("../../config/typeorm.config");
+const user_module_1 = require("../user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([

@@ -4,7 +4,7 @@ exports.configSwagger = void 0;
 const swagger_1 = require("@nestjs/swagger");
 function configSwagger(app) {
     const document = new swagger_1.DocumentBuilder()
-        .setTitle('Virgool\'s API')
+        .setTitle("Virgool's API")
         .setDescription('For learning more.')
         .setContact('Github', 'https://github.com/NimaCodez', 'nimacodes@gmail.com')
         .setVersion('v0.0.1')
