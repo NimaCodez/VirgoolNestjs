@@ -10,11 +10,11 @@ import { AuthModule } from '../auth/auth.module';
 	imports: [
 		ConfigModule.forRoot({
 			envFilePath: join(process.cwd(), '.env'),
-      isGlobal: true
+			isGlobal: true,
 		}),
-    TypeOrmModule.forRoot(typeormConfig()),
-	AuthModule,
-    UserModule
+		TypeOrmModule.forRoot(typeormConfig()),
+		AuthModule,
+		UserModule,
 	],
 	controllers: [],
 	providers: [],
