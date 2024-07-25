@@ -20,22 +20,22 @@ const class_validator_1 = require("class-validator");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("../user/entities/user.entity");
 const typeorm_2 = require("typeorm");
-const profile_entity_1 = require("../user/entities/profile.entity");
 const otp_entity_1 = require("../user/entities/otp.entity");
+const jwt_service_1 = require("./jwt.service");
 let AuthService = class AuthService {
-    constructor(userRepo, profileRepo, otpRepo) {
+    constructor(userRepo, otpRepo, jwtService) {
         this.userRepo = userRepo;
-        this.profileRepo = profileRepo;
         this.otpRepo = otpRepo;
+        this.jwtService = jwtService;
     }
     async userExistence(authDto) {
         const { type, method, username } = authDto;
         console.log(method);
         switch (type) {
             case types_enum_1.AuthType.Login:
-                return this.Login(method, username);
+                return await this.Login(method, username);
             case types_enum_1.AuthType.Register:
-                return this.Register(method, username);
+                return await this.Register(method, username);
             default:
                 throw new common_1.UnauthorizedException();
         }
@@ -46,7 +46,11 @@ let AuthService = class AuthService {
         if (!user)
             throw new common_1.UnauthorizedException('user not found');
         const otp = await this.CreateAndSaveOTP(user.id);
+        const token = await this.jwtService.SignAccessToken({ id: user.id });
+        console.log(token);
         return {
+            message: `OTP was sent to your ${method} successfully`,
+            token,
             code: otp.code,
         };
     }
@@ -63,7 +67,10 @@ let AuthService = class AuthService {
         });
         user = await this.userRepo.save(user);
         const otp = await this.CreateAndSaveOTP(user.id);
+        const token = await this.jwtService.SignAccessToken({ id: user.id });
         return {
+            message: `OTP was sent to your ${method} successfully`,
+            token,
             code: otp.code,
         };
     }
@@ -125,7 +132,6 @@ let AuthService = class AuthService {
             otp.userId = userId;
         }
         otp = await this.otpRepo.save(otp);
-        console.log('otp: -- ', otp);
         if (!otpExists)
             await this.userRepo.update({ id: userId }, { otpId: otp.id });
         return otp;
@@ -135,11 +141,10 @@ let AuthService = class AuthService {
 AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(1, (0, typeorm_1.InjectRepository)(profile_entity_1.Profile)),
-    __param(2, (0, typeorm_1.InjectRepository)(otp_entity_1.OTP)),
+    __param(1, (0, typeorm_1.InjectRepository)(otp_entity_1.OTP)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        jwt_service_1.JWTService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

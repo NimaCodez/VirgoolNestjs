@@ -22,16 +22,22 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async userExistence(authDto) {
-        return this.authService.userExistence(authDto);
+    async userExistence(authDto, res) {
+        const result = await this.authService.userExistence(authDto);
+        res.cookie('otp', result.token);
+        return res.json({
+            message: 'Sending Code was successful',
+            code: result.code,
+        });
     }
 };
 __decorate([
     (0, common_1.Post)('user-existence'),
     (0, swagger_1.ApiConsumes)(swagger_consumes_enum_1.SwaggerConsumes.UrlEncoded, swagger_consumes_enum_1.SwaggerConsumes.Json),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [auth_dto_1.AuthDto]),
+    __metadata("design:paramtypes", [auth_dto_1.AuthDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "userExistence", null);
 AuthController = __decorate([

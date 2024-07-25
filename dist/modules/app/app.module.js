@@ -21,11 +21,11 @@ AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 envFilePath: (0, path_1.join)(process.cwd(), '.env'),
-                isGlobal: true
+                isGlobal: true,
             }),
             typeorm_1.TypeOrmModule.forRoot((0, typeorm_config_1.typeormConfig)()),
             auth_module_1.AuthModule,
-            user_module_1.UserModule
+            user_module_1.UserModule,
         ],
         controllers: [],
         providers: [],

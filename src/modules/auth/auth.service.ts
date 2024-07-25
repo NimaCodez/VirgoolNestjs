@@ -11,15 +11,15 @@ import { isEmail, isMobilePhone } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
-import { Profile } from '../user/entities/profile.entity';
 import { OTP } from '../user/entities/otp.entity';
+import { JWTService } from './jwt.service';
 
 @Injectable()
 export class AuthService {
 	constructor(
 		@InjectRepository(User) private userRepo: Repository<User>,
-		@InjectRepository(Profile) private profileRepo: Repository<Profile>,
 		@InjectRepository(OTP) private otpRepo: Repository<OTP>,
+		private jwtService: JWTService,
 	) {}
 
 	async userExistence(authDto: AuthDto) {
@@ -27,9 +27,9 @@ export class AuthService {
 		console.log(method);
 		switch (type) {
 			case AuthType.Login:
-				return this.Login(method, username);
+				return await this.Login(method, username);
 			case AuthType.Register:
-				return this.Register(method, username);
+				return await this.Register(method, username);
 			default:
 				throw new UnauthorizedException();
 		}
@@ -41,8 +41,13 @@ export class AuthService {
 		if (!user) throw new UnauthorizedException('user not found');
 
 		const otp = await this.CreateAndSaveOTP(user.id);
+		const token = await this.jwtService.SignAccessToken({ id: user.id });
+
+		console.log(token)
 
 		return {
+			message: `OTP was sent to your ${method} successfully`,
+			token,
 			code: otp.code,
 		};
 	}
@@ -62,8 +67,11 @@ export class AuthService {
 		user = await this.userRepo.save(user);
 
 		const otp = await this.CreateAndSaveOTP(user.id);
+		const token = await this.jwtService.SignAccessToken({ id: user.id });
 
 		return {
+			message: `OTP was sent to your ${method} successfully`,
+			token,
 			code: otp.code,
 		};
 	}
@@ -134,8 +142,6 @@ export class AuthService {
 		}
 
 		otp = await this.otpRepo.save(otp);
-
-		console.log('otp: -- ', otp);
 
 		if (!otpExists)
 			await this.userRepo.update({ id: userId }, { otpId: otp.id });
