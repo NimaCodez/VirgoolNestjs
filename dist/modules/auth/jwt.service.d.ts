@@ -5,6 +5,6 @@ export declare class JWTService {
     constructor(jwtService: JwtService);
     SignAccessToken(payload: Payload): Promise<string>;
     SignRefreshToken(payload: Payload): Promise<string>;
-    VerifyAccessToken(token: string): Promise<any>;
+    VerifyAccessToken(token: string): Promise<Payload>;
     VerifyRefreshToken(token: string): Promise<void>;
 }

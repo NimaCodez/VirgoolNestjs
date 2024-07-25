@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, CheckOTPDto } from './dto/auth.dto';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
 import { Response } from 'express';
 
@@ -18,12 +18,21 @@ export class AuthController {
 
 	@Post('user-existence')
 	@ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
-	async userExistence(@Body() authDto: AuthDto, @Res() res: Response) {
+	async UserExistence(@Body() authDto: AuthDto, @Res() res: Response) {
 		const result = await this.authService.userExistence(authDto);
-		res.cookie('otp', result.token);
+		res.cookie('otp', result.token, {
+			httpOnly: true,
+			expires: new Date(new Date().getTime() + 1000 * 60 * 2),
+		});
 		return res.json({
 			message: 'Sending Code was successful',
 			code: result.code,
 		});
+	}
+
+	@Post('check-otp')
+	@ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
+	async CheckOTP(@Body() checkOtpDto: CheckOTPDto) {
+		return this.authService.CheckOTP(checkOtpDto);
 	}
 }

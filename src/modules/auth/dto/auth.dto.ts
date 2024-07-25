@@ -15,3 +15,10 @@ export class AuthDto {
     @IsEnum(AuthMethod)
 	method: AuthMethod;
 }
+
+export class CheckOTPDto {
+	@ApiProperty()
+	@IsString()
+	@Length(6, 6)
+	code: string;
+}

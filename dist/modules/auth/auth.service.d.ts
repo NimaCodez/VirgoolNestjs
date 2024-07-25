@@ -1,14 +1,17 @@
-import { AuthDto } from './dto/auth.dto';
+/// <reference types="cookie-parser" />
+import { AuthDto, CheckOTPDto } from './dto/auth.dto';
 import { AuthMethod } from './enums/method.enum';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { OTP } from '../user/entities/otp.entity';
 import { JWTService } from './jwt.service';
+import { Request } from 'express';
 export declare class AuthService {
     private userRepo;
     private otpRepo;
+    private req;
     private jwtService;
-    constructor(userRepo: Repository<User>, otpRepo: Repository<OTP>, jwtService: JWTService);
+    constructor(userRepo: Repository<User>, otpRepo: Repository<OTP>, req: Request, jwtService: JWTService);
     userExistence(authDto: AuthDto): Promise<{
         message: string;
         token: string;
@@ -32,5 +35,7 @@ export declare class AuthService {
     GetRandomNumber(): Promise<number>;
     GetExpiryTime(): Promise<Date>;
     CreateAndSaveOTP(userId: number): Promise<OTP>;
-    CheckOTP(): Promise<void>;
+    CheckOTP(data: CheckOTPDto): Promise<{
+        message: string;
+    }>;
 }

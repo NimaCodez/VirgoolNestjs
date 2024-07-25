@@ -22,13 +22,19 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async userExistence(authDto, res) {
+    async UserExistence(authDto, res) {
         const result = await this.authService.userExistence(authDto);
-        res.cookie('otp', result.token);
+        res.cookie('otp', result.token, {
+            httpOnly: true,
+            expires: new Date(new Date().getTime() + 1000 * 60 * 2),
+        });
         return res.json({
             message: 'Sending Code was successful',
             code: result.code,
         });
+    }
+    async CheckOTP(checkOtpDto) {
+        return this.authService.CheckOTP(checkOtpDto);
     }
 };
 __decorate([
@@ -39,7 +45,15 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_dto_1.AuthDto, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "userExistence", null);
+], AuthController.prototype, "UserExistence", null);
+__decorate([
+    (0, common_1.Post)('check-otp'),
+    (0, swagger_1.ApiConsumes)(swagger_consumes_enum_1.SwaggerConsumes.UrlEncoded, swagger_consumes_enum_1.SwaggerConsumes.Json),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.CheckOTPDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "CheckOTP", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     (0, swagger_1.ApiTags)('Auth'),

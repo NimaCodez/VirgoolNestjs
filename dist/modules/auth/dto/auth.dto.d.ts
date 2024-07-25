@@ -4,3 +4,6 @@ export declare class AuthDto {
     type: string;
     method: AuthMethod;
 }
+export declare class CheckOTPDto {
+    code: string;
+}

@@ -1,1 +1,3 @@
-export type Payload = string | object | number;
+export type Payload = {
+    userId: number;
+};

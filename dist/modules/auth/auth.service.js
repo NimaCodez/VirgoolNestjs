@@ -22,15 +22,16 @@ const user_entity_1 = require("../user/entities/user.entity");
 const typeorm_2 = require("typeorm");
 const otp_entity_1 = require("../user/entities/otp.entity");
 const jwt_service_1 = require("./jwt.service");
+const core_1 = require("@nestjs/core");
 let AuthService = class AuthService {
-    constructor(userRepo, otpRepo, jwtService) {
+    constructor(userRepo, otpRepo, req, jwtService) {
         this.userRepo = userRepo;
         this.otpRepo = otpRepo;
+        this.req = req;
         this.jwtService = jwtService;
     }
     async userExistence(authDto) {
         const { type, method, username } = authDto;
-        console.log(method);
         switch (type) {
             case types_enum_1.AuthType.Login:
                 return await this.Login(method, username);
@@ -46,8 +47,7 @@ let AuthService = class AuthService {
         if (!user)
             throw new common_1.UnauthorizedException('user not found');
         const otp = await this.CreateAndSaveOTP(user.id);
-        const token = await this.jwtService.SignAccessToken({ id: user.id });
-        console.log(token);
+        const token = await this.jwtService.SignAccessToken({ userId: user.id });
         return {
             message: `OTP was sent to your ${method} successfully`,
             token,
@@ -67,7 +67,7 @@ let AuthService = class AuthService {
         });
         user = await this.userRepo.save(user);
         const otp = await this.CreateAndSaveOTP(user.id);
-        const token = await this.jwtService.SignAccessToken({ id: user.id });
+        const token = await this.jwtService.SignAccessToken({ userId: user.id });
         return {
             message: `OTP was sent to your ${method} successfully`,
             token,
@@ -136,15 +136,30 @@ let AuthService = class AuthService {
             await this.userRepo.update({ id: userId }, { otpId: otp.id });
         return otp;
     }
-    async CheckOTP() { }
+    async CheckOTP(data) {
+        var _a;
+        const token = (_a = this.req.cookies) === null || _a === void 0 ? void 0 : _a['otp'];
+        if (!token)
+            throw new common_1.UnauthorizedException('token expired or not found.');
+        const { userId } = await this.jwtService.VerifyAccessToken(token);
+        const otp = await this.otpRepo.findOneBy({ userId });
+        if (!otp)
+            throw new common_1.UnauthorizedException('Please login or signup to receive a code.');
+        else if (otp && data.code != otp.code)
+            throw new common_1.UnauthorizedException('code is incorrect.');
+        else if (otp && new Date().getTime() < otp.expiresIn.getTime())
+            return {
+                message: 'You logged in successfully',
+            };
+    }
 };
 AuthService = __decorate([
-    (0, common_1.Injectable)(),
+    (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(1, (0, typeorm_1.InjectRepository)(otp_entity_1.OTP)),
+    __param(2, (0, common_1.Inject)(core_1.REQUEST)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository,
-        jwt_service_1.JWTService])
+        typeorm_2.Repository, Object, jwt_service_1.JWTService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

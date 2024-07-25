@@ -34,10 +34,13 @@ let JWTService = class JWTService {
     }
     async VerifyAccessToken(token) {
         try {
-            return await this.jwtService.verifyAsync(token);
+            const { payload } = await this.jwtService.verifyAsync(token, {
+                secret: process.env.JWT_ACCESS_KEY_SECRET,
+            });
+            return payload;
         }
         catch (error) {
-            throw error;
+            throw new common_1.UnauthorizedException('invalid token');
         }
     }
     async VerifyRefreshToken(token) { }

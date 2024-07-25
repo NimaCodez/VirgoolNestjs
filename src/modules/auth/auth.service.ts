@@ -1,10 +1,12 @@
 import {
 	BadRequestException,
 	ConflictException,
+	Inject,
 	Injectable,
+	Scope,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, CheckOTPDto } from './dto/auth.dto';
 import { AuthType } from './enums/types.enum';
 import { AuthMethod } from './enums/method.enum';
 import { isEmail, isMobilePhone } from 'class-validator';
@@ -13,18 +15,20 @@ import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { OTP } from '../user/entities/otp.entity';
 import { JWTService } from './jwt.service';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuthService {
 	constructor(
 		@InjectRepository(User) private userRepo: Repository<User>,
 		@InjectRepository(OTP) private otpRepo: Repository<OTP>,
+		@Inject(REQUEST) private req: Request,
 		private jwtService: JWTService,
 	) {}
 
 	async userExistence(authDto: AuthDto) {
 		const { type, method, username } = authDto;
-		console.log(method);
 		switch (type) {
 			case AuthType.Login:
 				return await this.Login(method, username);
@@ -41,9 +45,7 @@ export class AuthService {
 		if (!user) throw new UnauthorizedException('user not found');
 
 		const otp = await this.CreateAndSaveOTP(user.id);
-		const token = await this.jwtService.SignAccessToken({ id: user.id });
-
-		console.log(token)
+		const token = await this.jwtService.SignAccessToken({ userId: user.id });
 
 		return {
 			message: `OTP was sent to your ${method} successfully`,
@@ -67,7 +69,7 @@ export class AuthService {
 		user = await this.userRepo.save(user);
 
 		const otp = await this.CreateAndSaveOTP(user.id);
-		const token = await this.jwtService.SignAccessToken({ id: user.id });
+		const token = await this.jwtService.SignAccessToken({ userId: user.id });
 
 		return {
 			message: `OTP was sent to your ${method} successfully`,
@@ -149,5 +151,16 @@ export class AuthService {
 		return otp;
 	}
 
-	async CheckOTP() {}
+	async CheckOTP(data: CheckOTPDto) {
+		const token = this.req.cookies?.['otp'];
+		if (!token) throw new UnauthorizedException('token expired or not found.');
+		const { userId } = await this.jwtService.VerifyAccessToken(token);
+		const otp = await this.otpRepo.findOneBy({ userId });
+		if (!otp) throw new UnauthorizedException('Please login or signup to receive a code.');
+		else if (otp && data.code != otp.code) throw new UnauthorizedException('code is incorrect.');
+		else if (otp && new Date().getTime() < otp.expiresIn.getTime()) 
+		return {
+			message: 'You logged in successfully',
+		};
+	}
 }
