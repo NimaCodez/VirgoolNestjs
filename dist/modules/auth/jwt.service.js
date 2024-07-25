@@ -12,21 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JWTService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const signing_types_enum_1 = require("./enums/signing-types.enum");
 let JWTService = class JWTService {
     constructor(jwtService) {
         this.jwtService = jwtService;
     }
-    async SignAccessToken(payload) {
+    async SignAccessToken(payload, signingType) {
         try {
-            return await this.jwtService.signAsync({ payload }, { expiresIn: '15m', secret: process.env.JWT_ACCESS_KEY_SECRET });
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    async SignRefreshToken(payload) {
-        try {
-            return await this.jwtService.signAsync({ payload }, { expiresIn: '15m', secret: process.env.JWT_ACCESS_KEY_SECRET });
+            let options = {
+                secret: process.env.JWT_ACCESS_KEY_SECRET,
+                expiresIn: '15m',
+            };
+            if (signingType === signing_types_enum_1.SigningType.OTPToken)
+                options.expiresIn = '2m';
+            return await this.jwtService.signAsync({ payload }, options);
         }
         catch (error) {
             throw error;
@@ -41,6 +40,14 @@ let JWTService = class JWTService {
         }
         catch (error) {
             throw new common_1.UnauthorizedException('invalid token');
+        }
+    }
+    async SignRefreshToken(payload) {
+        try {
+            return await this.jwtService.signAsync({ payload }, { expiresIn: '15m', secret: process.env.JWT_ACCESS_KEY_SECRET });
+        }
+        catch (error) {
+            throw error;
         }
     }
     async VerifyRefreshToken(token) { }

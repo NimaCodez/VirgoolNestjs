@@ -17,6 +17,7 @@ import { OTP } from '../user/entities/otp.entity';
 import { JWTService } from './jwt.service';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { SigningType } from './enums/signing-types.enum';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService {
@@ -45,7 +46,10 @@ export class AuthService {
 		if (!user) throw new UnauthorizedException('user not found');
 
 		const otp = await this.CreateAndSaveOTP(user.id);
-		const token = await this.jwtService.SignAccessToken({ userId: user.id });
+		const token = await this.jwtService.SignAccessToken(
+			{ userId: user.id },
+			SigningType.OTPToken,
+		);
 
 		return {
 			message: `OTP was sent to your ${method} successfully`,
@@ -69,7 +73,10 @@ export class AuthService {
 		user = await this.userRepo.save(user);
 
 		const otp = await this.CreateAndSaveOTP(user.id);
-		const token = await this.jwtService.SignAccessToken({ userId: user.id });
+		const token = await this.jwtService.SignAccessToken(
+			{ userId: user.id },
+			SigningType.OTPToken,
+		);
 
 		return {
 			message: `OTP was sent to your ${method} successfully`,
@@ -154,13 +161,29 @@ export class AuthService {
 	async CheckOTP(data: CheckOTPDto) {
 		const token = this.req.cookies?.['otp'];
 		if (!token) throw new UnauthorizedException('token expired or not found.');
+
 		const { userId } = await this.jwtService.VerifyAccessToken(token);
 		const otp = await this.otpRepo.findOneBy({ userId });
-		if (!otp) throw new UnauthorizedException('Please login or signup to receive a code.');
-		else if (otp && data.code != otp.code) throw new UnauthorizedException('code is incorrect.');
-		else if (otp && new Date().getTime() < otp.expiresIn.getTime()) 
+
+		if (!otp)
+			throw new UnauthorizedException(
+				'Please login or signup to receive a code.',
+			);
+		else if (otp && data.code != otp.code)
+			throw new UnauthorizedException('code is incorrect.');
+		else if (otp && new Date().getTime() > otp.expiresIn.getTime())
+			throw new UnauthorizedException('code expired.');
+
+		const accessToken = await this.jwtService.SignAccessToken(
+			{ userId },
+			SigningType.AccessToken,
+		);
+		const refreshToken = await this.jwtService.SignRefreshToken({ userId });
+
 		return {
 			message: 'You logged in successfully',
+			accessToken,
+			refreshToken,
 		};
 	}
 }

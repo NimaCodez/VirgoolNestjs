@@ -7,5 +7,7 @@ export declare class AuthController {
     UserExistence(authDto: AuthDto, res: Response): Promise<Response<any, Record<string, any>>>;
     CheckOTP(checkOtpDto: CheckOTPDto): Promise<{
         message: string;
+        accessToken: string;
+        refreshToken: string;
     }>;
 }

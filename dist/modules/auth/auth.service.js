@@ -23,6 +23,7 @@ const typeorm_2 = require("typeorm");
 const otp_entity_1 = require("../user/entities/otp.entity");
 const jwt_service_1 = require("./jwt.service");
 const core_1 = require("@nestjs/core");
+const signing_types_enum_1 = require("./enums/signing-types.enum");
 let AuthService = class AuthService {
     constructor(userRepo, otpRepo, req, jwtService) {
         this.userRepo = userRepo;
@@ -47,7 +48,7 @@ let AuthService = class AuthService {
         if (!user)
             throw new common_1.UnauthorizedException('user not found');
         const otp = await this.CreateAndSaveOTP(user.id);
-        const token = await this.jwtService.SignAccessToken({ userId: user.id });
+        const token = await this.jwtService.SignAccessToken({ userId: user.id }, signing_types_enum_1.SigningType.OTPToken);
         return {
             message: `OTP was sent to your ${method} successfully`,
             token,
@@ -67,7 +68,7 @@ let AuthService = class AuthService {
         });
         user = await this.userRepo.save(user);
         const otp = await this.CreateAndSaveOTP(user.id);
-        const token = await this.jwtService.SignAccessToken({ userId: user.id });
+        const token = await this.jwtService.SignAccessToken({ userId: user.id }, signing_types_enum_1.SigningType.OTPToken);
         return {
             message: `OTP was sent to your ${method} successfully`,
             token,
@@ -147,10 +148,15 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Please login or signup to receive a code.');
         else if (otp && data.code != otp.code)
             throw new common_1.UnauthorizedException('code is incorrect.');
-        else if (otp && new Date().getTime() < otp.expiresIn.getTime())
-            return {
-                message: 'You logged in successfully',
-            };
+        else if (otp && new Date().getTime() > otp.expiresIn.getTime())
+            throw new common_1.UnauthorizedException('code expired.');
+        const accessToken = await this.jwtService.SignAccessToken({ userId }, signing_types_enum_1.SigningType.AccessToken);
+        const refreshToken = await this.jwtService.SignRefreshToken({ userId });
+        return {
+            message: 'You logged in successfully',
+            accessToken,
+            refreshToken,
+        };
     }
 };
 AuthService = __decorate([

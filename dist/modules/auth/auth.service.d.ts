@@ -37,5 +37,7 @@ export declare class AuthService {
     CreateAndSaveOTP(userId: number): Promise<OTP>;
     CheckOTP(data: CheckOTPDto): Promise<{
         message: string;
+        accessToken: string;
+        refreshToken: string;
     }>;
 }
