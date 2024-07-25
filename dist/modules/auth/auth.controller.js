@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const swagger_1 = require("@nestjs/swagger");
 const auth_dto_1 = require("./dto/auth.dto");
 const swagger_consumes_enum_1 = require("../../common/enum/swagger-consumes.enum");
+const auth_guard_1 = require("./guards/auth.guard");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -35,6 +36,9 @@ let AuthController = class AuthController {
     }
     async CheckOTP(checkOtpDto) {
         return this.authService.CheckOTP(checkOtpDto);
+    }
+    async GetLoggedInUser(req) {
+        return req.user;
     }
 };
 __decorate([
@@ -54,6 +58,15 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.CheckOTPDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "CheckOTP", null);
+__decorate([
+    (0, common_1.Get)('logged-in-user'),
+    (0, swagger_1.ApiBearerAuth)('Authorization'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthUser),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "GetLoggedInUser", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     (0, swagger_1.ApiTags)('Auth'),

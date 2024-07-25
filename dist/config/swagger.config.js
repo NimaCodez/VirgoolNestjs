@@ -8,9 +8,18 @@ function configSwagger(app) {
         .setDescription('For learning more.')
         .setContact('Github', 'https://github.com/NimaCodez', 'nimacodes@gmail.com')
         .setVersion('v0.0.1')
+        .addBearerAuth(swaggerAuthConfig(), 'Authorization')
         .build();
     const swaggerDocument = swagger_1.SwaggerModule.createDocument(app, document);
     swagger_1.SwaggerModule.setup('/api-docs', app, swaggerDocument);
 }
 exports.configSwagger = configSwagger;
+function swaggerAuthConfig() {
+    return {
+        type: 'http',
+        bearerFormat: 'JWT',
+        in: 'header',
+        scheme: 'bearer'
+    };
+}
 //# sourceMappingURL=swagger.config.js.map

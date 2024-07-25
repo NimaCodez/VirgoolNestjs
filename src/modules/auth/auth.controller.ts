@@ -1,15 +1,19 @@
 import {
 	Body,
 	Controller,
+	Get,
 	InternalServerErrorException,
 	Post,
+	Req,
 	Res,
+	UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDto, CheckOTPDto } from './dto/auth.dto';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { AuthUser } from './guards/auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -34,5 +38,12 @@ export class AuthController {
 	@ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
 	async CheckOTP(@Body() checkOtpDto: CheckOTPDto) {
 		return this.authService.CheckOTP(checkOtpDto);
+	}
+
+	@Get('logged-in-user')
+	@ApiBearerAuth('Authorization')
+	@UseGuards(AuthUser)
+	async GetLoggedInUser(@Req() req: Request) {
+		return req.user;
 	}
 }

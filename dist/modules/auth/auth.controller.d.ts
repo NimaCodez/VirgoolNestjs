@@ -1,6 +1,7 @@
+/// <reference types="cookie-parser" />
 import { AuthService } from './auth.service';
 import { AuthDto, CheckOTPDto } from './dto/auth.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -10,4 +11,5 @@ export declare class AuthController {
         accessToken: string;
         refreshToken: string;
     }>;
+    GetLoggedInUser(req: Request): Promise<import("../user/entities/user.entity").User>;
 }
