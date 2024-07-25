@@ -39,6 +39,10 @@ let JWTService = class JWTService {
             return payload;
         }
         catch (error) {
+            if (error instanceof jwt_1.TokenExpiredError)
+                throw new common_1.UnauthorizedException('Token expired!');
+            if (error instanceof jwt_1.JsonWebTokenError)
+                throw new common_1.UnauthorizedException('invalid token');
             throw new common_1.UnauthorizedException('invalid token');
         }
     }

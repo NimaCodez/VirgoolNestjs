@@ -5,21 +5,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var AuthModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
-const user_module_1 = require("../user/user.module");
 const jwt_service_1 = require("./jwt.service");
 const jwt_1 = require("@nestjs/jwt");
-let AuthModule = class AuthModule {
+const typeorm_1 = require("@nestjs/typeorm");
+const user_entity_1 = require("../user/entities/user.entity");
+const otp_entity_1 = require("../user/entities/otp.entity");
+let AuthModule = AuthModule_1 = class AuthModule {
 };
-AuthModule = __decorate([
+AuthModule = AuthModule_1 = __decorate([
     (0, common_1.Module)({
-        imports: [user_module_1.UserModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User, otp_entity_1.OTP])],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_service_1.JWTService, jwt_1.JwtService],
+        exports: [AuthModule_1, jwt_service_1.JWTService]
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

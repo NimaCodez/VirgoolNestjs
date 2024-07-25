@@ -19,6 +19,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("../../user/entities/user.entity");
 const typeorm_2 = require("typeorm");
 const class_validator_1 = require("class-validator");
+const jwt_1 = require("@nestjs/jwt");
 let AuthUser = class AuthUser {
     constructor(userRepo, jwtService) {
         this.userRepo = userRepo;
@@ -36,7 +37,14 @@ let AuthUser = class AuthUser {
             return true;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error);
+            console.log(error);
+            if (error instanceof jwt_1.TokenExpiredError) {
+                throw new common_1.BadRequestException('Token expired!');
+            }
+            throw new common_1.UnauthorizedException('Sth went wrong', {
+                cause: new Error(error),
+                description: error,
+            });
         }
     }
     async ExtractAndVerifyToken(request) {
@@ -44,7 +52,7 @@ let AuthUser = class AuthUser {
         if (!authorization || (authorization === null || authorization === void 0 ? void 0 : authorization.trim()) === '')
             throw new common_1.UnauthorizedException('Login to your account.');
         const [bearer, token] = authorization.split(' ');
-        if ((bearer === null || bearer === void 0 ? void 0 : bearer.toLocaleLowerCase()) !== 'bearer' || !token || !(0, class_validator_1.isJWT)(token))
+        if ((bearer === null || bearer === void 0 ? void 0 : bearer.toLowerCase()) !== 'bearer' || !token || !(0, class_validator_1.isJWT)(token))
             throw new common_1.UnauthorizedException('Invalid Token');
         return token;
     }

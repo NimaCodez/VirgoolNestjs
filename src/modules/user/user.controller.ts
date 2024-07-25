@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/guards/auth.guard';
+import { Request } from 'express';
 
 @Controller('user')
 @ApiTags('User')
@@ -16,8 +17,10 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  @ApiBearerAuth('Authorization')
+  @UseGuards(AuthUser)
+  findAll(@Req() req: Request) {
+    return this.userService.findAll(req);
   }
 
   @Get(':id')

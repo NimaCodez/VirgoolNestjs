@@ -6,27 +6,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
+exports.CategoriesService = void 0;
 const common_1 = require("@nestjs/common");
-let UserService = class UserService {
-    create(createUserDto) {
-        return 'This action adds a new user';
+let CategoriesService = class CategoriesService {
+    create(createCategoryDto) {
+        return 'This action adds a new category';
     }
-    findAll(request) {
-        return request.user;
+    findAll() {
+        return `This action returns all categories`;
     }
     findOne(id) {
-        return `This action returns a #${id} user`;
+        return `This action returns a #${id} category`;
     }
-    update(id, updateUserDto) {
-        return `This action updates a #${id} user`;
+    update(id, updateCategoryDto) {
+        return `This action updates a #${id} category`;
     }
     remove(id) {
-        return `This action removes a #${id} user`;
+        return `This action removes a #${id} category`;
     }
 };
-UserService = __decorate([
+CategoriesService = __decorate([
     (0, common_1.Injectable)()
-], UserService);
-exports.UserService = UserService;
-//# sourceMappingURL=user.service.js.map
+], CategoriesService);
+exports.CategoriesService = CategoriesService;
+//# sourceMappingURL=categories.service.js.map

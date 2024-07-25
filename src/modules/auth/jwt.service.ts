@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Payload } from './types/payload.type';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { SigningType } from './enums/signing-types.enum';
 
 @Injectable()
@@ -29,6 +29,8 @@ export class JWTService {
 
 			return payload;
 		} catch (error) {
+			if (error instanceof TokenExpiredError) throw new UnauthorizedException('Token expired!');
+			if (error instanceof JsonWebTokenError) throw new UnauthorizedException('invalid token');
 			throw new UnauthorizedException('invalid token');
 		}
 	}
