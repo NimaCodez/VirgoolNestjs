@@ -1,1 +1,5 @@
 node_modules
+dist
+.eslintrc.js
+nest-cli.json
+.env

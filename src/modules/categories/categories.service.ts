@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -46,15 +46,41 @@ export class CategoriesService {
 
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} category`;
+	async findOne(id: number) {
+		const category = await this.categoryRepo.findOneBy({ id });
+		if (!category) throw new NotFoundException('Category was not found');
+
+		return category;
 	}
 
-	update(id: number, updateCategoryDto: UpdateCategoryDto) {
-		return `This action updates a #${id} category`;
+	private FilterUpdates(dto: UpdateCategoryDto): Partial<UpdateCategoryDto> {
+		return Object.fromEntries(
+			Object.entries(dto)
+				.filter(([_, value]) => value !== null && value !== undefined)
+		);
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} category`;
+	async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+		const category = await this.findOne(id);
+
+		const updates = this.FilterUpdates(updateCategoryDto);
+
+		if (Object.keys(updates).length === 0 ) throw new BadRequestException('Nothing was updated');
+		
+		Object.assign(category, updates)
+		await this.categoryRepo.save(category);
+
+		return {
+			message: 'Category was updated successfully',
+		} 
+	}
+
+	async remove(id: number) {
+		const category = await this.findOne(id);
+		await this.categoryRepo.delete({ id: category.id });
+
+		return {
+			message: 'Category deleted'
+		}
 	}
 }

@@ -13,6 +13,6 @@ import { OTP } from '../user/entities/otp.entity';
   imports: [TypeOrmModule.forFeature([User, OTP])],
   controllers: [AuthController],
   providers: [AuthService, JWTService, JwtService],
-  exports: [AuthModule, JWTService]
+  exports: [AuthModule, JWTService, JwtService]
 })
 export class AuthModule {}
