@@ -9,21 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Category = void 0;
-const base_entity_1 = require("../../../common/abstracts/base.entity");
-const typeorm_1 = require("typeorm");
-let Category = class Category extends base_entity_1.EntityBase {
-};
+exports.PaginationDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
+class PaginationDto {
+}
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Category.prototype, "title", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, swagger_1.ApiPropertyOptional)({ type: 'number' }),
     __metadata("design:type", Number)
-], Category.prototype, "priority", void 0);
-Category = __decorate([
-    (0, typeorm_1.Entity)({ name: 'categories' })
-], Category);
-exports.Category = Category;
-//# sourceMappingURL=category.entity.js.map
+], PaginationDto.prototype, "page", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: 'number' }),
+    __metadata("design:type", Number)
+], PaginationDto.prototype, "limit", void 0);
+exports.PaginationDto = PaginationDto;
+//# sourceMappingURL=pagination.dto.js.map

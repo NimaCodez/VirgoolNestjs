@@ -17,15 +17,19 @@ const common_1 = require("@nestjs/common");
 const categories_service_1 = require("./categories.service");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_category_dto_1 = require("./dto/update-category.dto");
+const swagger_1 = require("@nestjs/swagger");
+const swagger_consumes_enum_1 = require("../../common/enum/swagger-consumes.enum");
+const pagination_dto_1 = require("./dto/pagination.dto");
+const pagination_decorator_1 = require("../../common/decorators/pagination.decorator");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
+    async create(createCategoryDto) {
         return this.categoriesService.create(createCategoryDto);
     }
-    findAll() {
-        return this.categoriesService.findAll();
+    findAll(paginationDto) {
+        return this.categoriesService.findAll(paginationDto);
     }
     findOne(id) {
         return this.categoriesService.findOne(+id);
@@ -39,15 +43,18 @@ let CategoriesController = class CategoriesController {
 };
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiConsumes)(swagger_consumes_enum_1.SwaggerConsumes.UrlEncoded, swagger_consumes_enum_1.SwaggerConsumes.Json),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, pagination_decorator_1.Paginate)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [pagination_dto_1.PaginationDto]),
     __metadata("design:returntype", void 0)
 ], CategoriesController.prototype, "findAll", null);
 __decorate([
@@ -74,6 +81,7 @@ __decorate([
 ], CategoriesController.prototype, "remove", null);
 CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),
+    (0, swagger_1.ApiTags)('Categories'),
     __metadata("design:paramtypes", [categories_service_1.CategoriesService])
 ], CategoriesController);
 exports.CategoriesController = CategoriesController;
