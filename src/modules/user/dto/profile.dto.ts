@@ -14,7 +14,7 @@ export class UpdateProfileDto {
     @ApiPropertyOptional({ nullable: true, format: 'binary' })
     avatar: string;
 
-    @ApiPropertyOptional({ nullable: true })
+    @ApiPropertyOptional({ nullable: true, format: 'binary' })
     bgImage: string;
 
     @ApiPropertyOptional({ nullable: true, enum: Gender })

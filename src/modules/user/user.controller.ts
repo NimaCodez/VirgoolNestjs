@@ -31,7 +31,7 @@ export class UserController {
 
 	@Put('/profile')
 	@ApiConsumes(SwaggerConsumes.Multipart)
-  async updateOrCreateProfile(updateProfileDto: UpdateProfileDto) {
+  async updateOrCreateProfile(@Body() updateProfileDto: UpdateProfileDto) {
     return await this.userService.changeProfile(updateProfileDto);
   }
 
