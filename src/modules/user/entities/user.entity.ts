@@ -36,7 +36,7 @@ export class User extends EntityBase {
 	profileId: number;
 
 	@OneToOne(() => Profile, prof => prof.user, { cascade: ['remove'] })
-	@JoinColumn({ referencedColumnName: 'profileId' })
+	@JoinColumn()
 	profile: Profile;
 
 	@CreateDateColumn()
