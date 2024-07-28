@@ -1,10 +1,18 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	ConflictException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
-import { PaginationExecutor, PaginationResponseGenerator } from 'src/common/utils/pagination.utils';
+import {
+	PaginationExecutor,
+	PaginationResponseGenerator,
+} from 'src/common/utils/pagination.utils';
 import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
@@ -34,16 +42,15 @@ export class CategoriesService {
 	async findAll(paginationDto: PaginationDto) {
 		const { skip, limit, page } = PaginationExecutor(paginationDto);
 		const [categories, count] = await this.categoryRepo.findAndCount({
-      where: {},
+			where: {},
 			skip,
 			take: limit,
 		});
 
-    return {
-      categories,
-      pagination: PaginationResponseGenerator(count, page, limit),
-    }
-
+		return {
+			categories,
+			pagination: PaginationResponseGenerator(count, page, limit),
+		};
 	}
 
 	async findOne(id: number) {
@@ -55,8 +62,9 @@ export class CategoriesService {
 
 	private FilterUpdates(dto: UpdateCategoryDto): Partial<UpdateCategoryDto> {
 		return Object.fromEntries(
-			Object.entries(dto)
-				.filter(([_, value]) => value !== null && value !== undefined)
+			Object.entries(dto).filter(
+				([_, value]) => value !== null && value !== undefined,
+			),
 		);
 	}
 
@@ -65,14 +73,15 @@ export class CategoriesService {
 
 		const updates = this.FilterUpdates(updateCategoryDto);
 
-		if (Object.keys(updates).length === 0 ) throw new BadRequestException('Nothing was updated');
-		
-		Object.assign(category, updates)
+		if (Object.keys(updates).length === 0)
+			throw new BadRequestException('Nothing was updated');
+
+		Object.assign(category, updates);
 		await this.categoryRepo.save(category);
 
 		return {
 			message: 'Category was updated successfully',
-		} 
+		};
 	}
 
 	async remove(id: number) {
@@ -80,7 +89,7 @@ export class CategoriesService {
 		await this.categoryRepo.delete({ id: category.id });
 
 		return {
-			message: 'Category deleted'
-		}
+			message: 'Category deleted',
+		};
 	}
 }

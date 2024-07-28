@@ -9,6 +9,7 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 import { OTP } from './otp.entity';
+import { Profile } from './profile.entity';
 
 @Entity({ name: 'users' })
 export class User extends EntityBase {
@@ -30,6 +31,13 @@ export class User extends EntityBase {
 	@OneToOne(() => OTP, otp => otp.user, { cascade: ['remove'], nullable: true })
 	@JoinColumn({ name: 'otpId' })
 	otp: OTP;
+
+	@Column({ nullable: true })
+	profileId: number;
+
+	@OneToOne(() => Profile, prof => prof.user, { cascade: ['remove'] })
+	@JoinColumn({ referencedColumnName: 'profileId' })
+	profile: Profile;
 
 	@CreateDateColumn()
 	createdAt: Date;
