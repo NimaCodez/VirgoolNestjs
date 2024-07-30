@@ -9,11 +9,12 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthDto, CheckOTPDto } from './dto/auth.dto';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
 import { Request, Response } from 'express';
 import { AuthUser } from './guards/auth.guard';
+import { ApplyAuth } from 'src/common/decorators/add-auth.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -41,9 +42,8 @@ export class AuthController {
 	}
 
 	@Get('logged-in-user')
-	@ApiBearerAuth('Authorization')
-	@UseGuards(AuthUser)
+	@ApplyAuth()
 	async GetLoggedInUser(@Req() req: Request) {
-		return req.user;
+		return await this.authService.getLoggedInUser();
 	}
 }

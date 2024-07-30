@@ -186,4 +186,28 @@ export class AuthService {
 			refreshToken,
 		};
 	}
+
+	async getLoggedInUser() {
+		const user = await this.userRepo.findOne({
+			where: {
+				id: this.req.user.id,
+			},
+			relations: {
+				profile: true,
+			},
+			select: {
+				profile: {
+					avatar: true,
+					bgImage: true,
+					bio: true,
+					birthday: true,
+					gender: true,
+					linkedin: true,
+					nickname: true,
+					twitter: true,
+				}
+			}
+		});
+		return user;
+	}
 }

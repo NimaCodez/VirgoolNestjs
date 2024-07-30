@@ -7,8 +7,7 @@ export class UpdateProfileDto {
     @Length(3, 50)
     nickname: string;
 
-    @ApiPropertyOptional({ nullable: true })
-    @Length(10, 200)
+    @ApiPropertyOptional({ nullable: true, minimum: 10, maximum: 100 })
     bio: string;
 
     @ApiPropertyOptional({ nullable: true, format: 'binary' })
@@ -19,7 +18,7 @@ export class UpdateProfileDto {
 
     @ApiPropertyOptional({ nullable: true, enum: Gender })
     @IsEnum(Gender)
-    gender: number;
+    gender: Gender;
 
     @ApiPropertyOptional({ nullable: true })
     birthday: Date;

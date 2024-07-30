@@ -17,23 +17,27 @@ export class UserService {
 		@Inject(REQUEST) private request: Request,
 	) {}
 
-	async changeProfile(updateProfileDto: UpdateProfileDto) {
+	async changeProfile(
+		files: Express.Multer.File,
+		updateProfileDto: UpdateProfileDto,
+	) {
 		const { id: userId, profileId } = this.request.user;
-		let profile = await this.profileRepo.findOneBy({ id: userId });
+		let profile = await this.profileRepo.findOneBy({ userId });
 
 		const updates = this.FilterUpdates(updateProfileDto);
 		if (Object.keys(updates).length === 0)
 			throw new BadRequestException('Nothing was updated');
 
-		Object.assign(profile, updates);
-
 		if (profile) {
+			Object.assign(profile, updates);
 			profile = await this.profileRepo.save(profile);
 		} else {
 			profile = this.profileRepo.create({ ...profile, userId });
+			Object.assign(profile, updates);
 		}
 
 		profile = await this.profileRepo.save(profile);
+
 		if (!profileId) {
 			await this.userRepo.update({ id: userId }, { profileId: profile.id });
 		}

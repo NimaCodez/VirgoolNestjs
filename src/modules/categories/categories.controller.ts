@@ -2,16 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe,
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ApiBearerAuth, ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
 import { PaginationDto } from './dto/pagination.dto';
 import { Paginate } from 'src/common/decorators/pagination.decorator';
 import { AuthUser } from '../auth/guards/auth.guard';
+import { ApplyAuth } from 'src/common/decorators/add-auth.decorator';
 
 @Controller('categories')
 @ApiTags('Categories')
-@UseGuards(AuthUser)
-@ApiBearerAuth('Authorization')
+@ApplyAuth()
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
   

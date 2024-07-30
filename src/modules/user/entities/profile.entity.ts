@@ -1,10 +1,11 @@
 import { EntityBase } from 'src/common/abstracts/base.entity';
 import { Column, Entity, OneToOne } from 'typeorm';
 import { User } from './user.entity';
+import { Gender } from '../enums/gender.enum';
 
 @Entity({ name: 'profiles' })
 export class Profile extends EntityBase {
-	@Column()
+	@Column({ unique: true })
 	nickname: string;
 
 	@Column({ nullable: true })
@@ -16,16 +17,16 @@ export class Profile extends EntityBase {
 	@Column({ nullable: true })
 	bgImage: string;
 
-	@Column({ nullable: true })
-	gender: number;
+	@Column({ type: String, enum: Gender, nullable: true })
+	gender: string;
 
 	@Column({ nullable: true })
 	birthday: Date;
 
-	@Column({ nullable: true })
+	@Column({ unique: true, default: '', nullable: true })
 	linkedin: string;
 
-	@Column({ nullable: true })
+	@Column({ unique: true, default: '', nullable: true })
 	twitter: string;
 
 	@Column({ nullable: true })
