@@ -6,31 +6,21 @@ import {
 	Patch,
 	Param,
 	Delete,
-	UseGuards,
 	Req,
 	Put,
-	UseInterceptors,
 	UploadedFiles,
-	ParseFilePipe,
+	UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { AuthUser } from '../auth/guards/auth.guard';
 import { Request } from 'express';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
 import { UpdateProfileDto } from './dto/profile.dto';
-import {
-	FileFieldsInterceptor,
-	FileInterceptor,
-} from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import {
-	MulterDestination,
-	MulterFilename,
-} from 'src/common/utils/multer.utils';
 import { ApplyAuth } from 'src/common/decorators/add-auth.decorator';
+import { UploadFile } from 'src/common/decorators/upload-file.decorator';
+import { FileTypeValidatorPipe } from 'src/common/pipes/file-validator.pipe';
 
 @Controller('user')
 @ApiTags('User')
@@ -45,32 +35,11 @@ export class UserController {
 	@Put('/profile')
 	@ApplyAuth()
 	@ApiConsumes(SwaggerConsumes.Multipart)
-	@UseInterceptors(
-		FileFieldsInterceptor(
-			[
-				{
-					name: 'avatar',
-					maxCount: 1,
-				},
-				{
-					name: 'bgImage',
-					maxCount: 1,
-				},
-			],
-			{
-				storage: diskStorage({
-					destination: MulterDestination('user-profiles'),
-					filename: MulterFilename,
-				}),
-			},
-		),
-	)
+	@UsePipes(FileTypeValidatorPipe)
+	@UploadFile(['avatar', 'bgImage'])
 	async updateOrCreateProfile(
-		@UploadedFiles(new ParseFilePipe({
-			fileIsRequired: false,
-			validators: []
-		})) files: Express.Multer.File,
-		@Body() updateProfileDto: UpdateProfileDto
+		@UploadedFiles() files: Express.Multer.File,
+		@Body() updateProfileDto: UpdateProfileDto,
 	) {
 		return await this.userService.changeProfile(files, updateProfileDto);
 	}

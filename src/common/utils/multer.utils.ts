@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { mkdirSync } from 'fs';
 import { extname, join } from 'path';
@@ -15,7 +16,13 @@ export function MulterDestination(folderName: string) {
 		file: MulterFile,
 		callback: CallbackDestinationType,
 	) {
-		let path = join(process.cwd(), 'public', 'uploads', folderName, String(req.user.id));
+		let path = join(
+			process.cwd(),
+			'public',
+			'uploads',
+			folderName,
+			String(req.user.id),
+		);
 		mkdirSync(path, { recursive: true });
 		callback(null, path);
 	};
@@ -26,7 +33,11 @@ export function MulterFilename(
 	file: MulterFile,
 	callback: CallbackFilenameType,
 ) {
-    const ext = extname(file.originalname);
+	const ext = extname(file.originalname).toLowerCase();
 	let filename = `${file.fieldname}${ext}`;
 	callback(null, filename);
-};
+}
+
+function IsValidImageFormat(ext: string) {
+	return ['.jpg', '.jpeg', '.png'].includes(ext);
+}

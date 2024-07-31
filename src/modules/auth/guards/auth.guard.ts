@@ -34,7 +34,6 @@ export class AuthUser implements CanActivate {
 			request.user = user;
 			return true;
 		} catch (error) {
-			console.log(error)
 			if (error instanceof TokenExpiredError) {
 				throw new BadRequestException('Token expired!');
 			}

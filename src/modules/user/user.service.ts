@@ -28,6 +28,17 @@ export class UserService {
 		if (Object.keys(updates).length === 0)
 			throw new BadRequestException('Nothing was updated');
 
+		const { avatar, bgImage } = files;
+		
+		if (avatar.length > 0) {
+			let [image] = avatar;
+			updates.avatar = image.path.split('public')[1].replace(/\\/g, '/');
+		}
+		if (bgImage.length > 0) {
+			let [image] = bgImage;
+			updates.bgImage = image.path.split('public')[1].replace(/\\/g, '/');
+		}
+
 		if (profile) {
 			Object.assign(profile, updates);
 			profile = await this.profileRepo.save(profile);
