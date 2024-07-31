@@ -9,7 +9,7 @@ export function UploadFile(args: string[]) {
     let FileFields: MulterField[] = args.map(field => ({
         name: field,
         maxCount: 1
-    }))
+    }));
 
     return applyDecorators(
         UseInterceptors(

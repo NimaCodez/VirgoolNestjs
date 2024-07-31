@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { mkdirSync } from 'fs';
 import { extname, join } from 'path';
@@ -36,8 +35,4 @@ export function MulterFilename(
 	const ext = extname(file.originalname).toLowerCase();
 	let filename = `${file.fieldname}${ext}`;
 	callback(null, filename);
-}
-
-function IsValidImageFormat(ext: string) {
-	return ['.jpg', '.jpeg', '.png'].includes(ext);
 }

@@ -1,36 +1,47 @@
 import { Injectable, PipeTransform, BadRequestException } from '@nestjs/common';
+import { unlink } from 'fs/promises';
 import { extname } from 'path';
 
 @Injectable()
 export class FileTypeValidatorPipe implements PipeTransform {
-  private readonly allowedExtensions = ['.jpg', '.jpeg', '.png'];
+	private readonly allowedExtensions = ['.jpg', '.jpeg', '.png'];
 
-  transform(value: any) {
-    // Check if the value is an object
-    if (!value || typeof value !== 'object') {
-      throw new BadRequestException('Invalid file data');
-    }
+	async transform(value: any) {
+		try {
+			// Check if the value is an object
+			if (!value || typeof value !== 'object') {
+				throw new BadRequestException('Invalid file data');
+			}
 
-    // Handle file validation
-    this.validateFiles(value, 'avatar');
-    this.validateFiles(value, 'bgImage');
+			// Handle file validation
+			await this.validateFiles(value, 'avatar');
+			await this.validateFiles(value, 'bgImage');
 
-    return value;
-  }
+			return value;
+		} catch (error) {
+			throw error;
+		}
+	}
 
-  private validateFiles(value: any, fieldName: string) {
-    const files = value[fieldName];
-    if (files && Array.isArray(files)) {
-      files.forEach(file => {
-        if (!file || !file.originalname) {
-          throw new BadRequestException(`Invalid file in ${fieldName}`);
-        }
+	private async validateFiles(value: any, fieldName: string) {
+		const files = value[fieldName];
+		if (files && Array.isArray(files)) {
+			for (const file of files) {
+				if (!file || !file.originalname) {
+					throw new BadRequestException(`Invalid file in ${fieldName}`);
+				}
 
-        const fileExtension = extname(file.originalname).toLowerCase();
-        if (!this.allowedExtensions.includes(fileExtension)) {
-          throw new BadRequestException(`Invalid file type in ${fieldName}. Allowed types: ${this.allowedExtensions.join(', ')}`);
-        }
-      });
-    }
-  }
+				const fileExtension = extname(file.originalname).toLowerCase();
+				if (!this.allowedExtensions.includes(fileExtension)) {
+					// Remove the invalid file
+					await unlink(file.path);
+					throw new BadRequestException(
+						`Invalid file type in ${fieldName}. Allowed types: ${this.allowedExtensions.join(
+							', ',
+						)}`,
+					);
+				}
+			}
+		}
+	}
 }

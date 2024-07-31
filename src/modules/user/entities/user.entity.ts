@@ -17,7 +17,7 @@ export class User extends EntityBase {
 	username: string;
 
 	@Column({ unique: true, nullable: true })
-	phoneNumber: string;
+	phone: string;
 
 	@Column({ unique: true, nullable: true })
 	email: string;
