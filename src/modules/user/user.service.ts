@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
+import {
+	BadRequestException,
+	ConflictException,
+	Inject,
+	Injectable,
+	Scope,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
@@ -7,7 +13,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
 import { REQUEST } from '@nestjs/core';
-import { UpdateProfileDto } from './dto/profile.dto';
+import { ChangeUsernameDto, UpdateProfileDto } from './dto/profile.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
@@ -31,9 +37,13 @@ export class UserService {
 		this.ExtractImages(files, updates);
 		this.LowerSocialIDsCase(updates as UpdateProfileDto);
 
-		const duplicates = await this.CheckDuplicateFields(updates as UpdateProfileDto);
+		const duplicates = await this.CheckDuplicateFields(
+			updates as UpdateProfileDto,
+		);
 		if (duplicates.length > 0) {
-			throw new BadRequestException(`Your ${duplicates.join(', ')} already exists`);
+			throw new BadRequestException(
+				`Your ${duplicates.join(', ')} already exists`,
+			);
 		}
 
 		if (profile) {
@@ -51,8 +61,22 @@ export class UserService {
 		};
 	}
 
-	create(createUserDto: CreateUserDto) {
-		return 'This action adds a new user';
+	async changeUsername(username: string) {
+		const { id } = this.request.user;
+		const user = await this.userRepo.findOneBy({ username });
+
+		if (user && user?.id !== id) {
+			throw new ConflictException('Username already exists');
+		} else if (user && user.id === id) {
+			return {
+				message: 'username updated',
+			};
+		}
+
+		await this.userRepo.update({ id }, { username });
+		return {
+			message: 'username updated',
+		}
 	}
 
 	findAll(request: Request) {

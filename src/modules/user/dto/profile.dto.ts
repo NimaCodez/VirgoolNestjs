@@ -1,5 +1,5 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEnum, IsOptional, Length } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsEnum, IsOptional, IsString, Length } from "class-validator";
 import { Gender } from "../enums/gender.enum";
 
 export class UpdateProfileDto {
@@ -36,4 +36,11 @@ export class UpdateProfileDto {
     @ApiPropertyOptional({ nullable: true })
     @IsOptional()
     twitter: string;
+}
+
+export class ChangeUsernameDto {
+    @ApiProperty()
+    @IsString()
+    @Length(3, 100)
+    username: string;
 }

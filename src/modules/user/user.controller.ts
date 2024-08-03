@@ -17,7 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
-import { UpdateProfileDto } from './dto/profile.dto';
+import { ChangeUsernameDto, UpdateProfileDto } from './dto/profile.dto';
 import { ApplyAuth } from 'src/common/decorators/add-auth.decorator';
 import { UploadFile } from 'src/common/decorators/upload-file.decorator';
 import { FileTypeValidatorPipe } from 'src/common/pipes/file-validator.pipe';
@@ -26,11 +26,6 @@ import { FileTypeValidatorPipe } from 'src/common/pipes/file-validator.pipe';
 @ApiTags('User')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
-
-	@Post()
-	create(@Body() createUserDto: CreateUserDto) {
-		return this.userService.create(createUserDto);
-	}
 
 	@Put('/profile')
 	@ApplyAuth()
@@ -58,6 +53,12 @@ export class UserController {
 	@Patch(':id')
 	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
 		return this.userService.update(+id, updateUserDto);
+	}
+
+	@Patch('/change-username')
+	changeUsername(@Body('id') usernameDto: ChangeUsernameDto) {
+		const { username } = usernameDto;
+		return this.userService.changeUsername(username);
 	}
 
 	@Delete(':id')
