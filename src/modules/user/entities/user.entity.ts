@@ -10,6 +10,10 @@ import {
 } from 'typeorm';
 import { OTP } from './otp.entity';
 import { Profile } from './profile.entity';
+import { Blog } from 'src/modules/blog/entities/blog.entity';
+import { Likes } from 'src/modules/blog/entities/like.entity';
+import { Bookmarks } from 'src/modules/blog/entities/bookmark.entity';
+import { Comments } from 'src/modules/blog/entities/comment.entity';
 
 @Entity({ name: 'users' })
 export class User extends EntityBase {
@@ -38,6 +42,18 @@ export class User extends EntityBase {
 	@OneToOne(() => Profile, prof => prof.user, { cascade: ['remove'] })
 	@JoinColumn()
 	profile: Profile;
+
+	@OneToMany(() => Blog, blog => blog.author)
+	blogs: Blog[];
+
+	@OneToMany(() => Likes, Likes => Likes.user)
+	likedBlogs: Likes[];
+
+	@OneToMany(() => Bookmarks, bookmark => bookmark.user)
+	bookmarkedBlogs: Bookmarks[];
+
+	@OneToMany(() => Comments, comment => comment.user)
+	comments: Comments[];
 
 	@CreateDateColumn()
 	createdAt: Date;

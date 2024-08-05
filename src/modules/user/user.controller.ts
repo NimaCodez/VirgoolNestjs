@@ -10,12 +10,13 @@ import {
 	Put,
 	UploadedFiles,
 	UsePipes,
+	Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { SwaggerConsumes } from 'src/common/enum/swagger-consumes.enum';
 import { ChangeUsernameDto, UpdateProfileDto } from './dto/profile.dto';
 import { ApplyAuth } from 'src/common/decorators/add-auth.decorator';
