@@ -24,6 +24,12 @@ export class Blog extends EntityBase {
 	@Column({ nullable: true })
 	image: string;
 
+	@Column({ unique: true })
+	slug: string;
+
+	@Column()
+	timeToRead: string;
+
 	@Column()
 	authorId: number;
 

@@ -1,0 +1,1 @@
+export const CreateSlug = (str: string) => str.replace(/[ًٌٍَُِّْ،\*\.\+\-ـ٪)(*&^%$#@!~`'";:?<>«»ٔئ`‌\[\]]/g, '')?.replace(/[\s]+/g, '-')
